@@ -27,6 +27,8 @@ typedef struct rc_lib_package {
     uint8_t mesh;
     uint8_t routing_length;
     uint8_t discover_state; ///< Zero means no discovery-message, one is a discovery message, two a discovery response
+    uint8_t _receive_state_machine_state;
+    uint8_t _data_byte_count;
 } rc_lib_package_t;
 
 uint8_t rc_lib_encode(rc_lib_package_t* package);

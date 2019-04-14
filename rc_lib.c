@@ -42,25 +42,22 @@ uint8_t rc_lib_encode(rc_lib_package_t* package) {
 }
 
 uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
-    static uint8_t receiveStateMachineState = 0;
-    static uint8_t dataByteCount = 0;
-
-    switch(receiveStateMachineState){
+    switch(package->_receive_state_machine_state){
         case 0: // Initial state
             package->buf_count = 0;
             if(data == RC_LIB_START) {
-                receiveStateMachineState = 1;
+                package->_receive_state_machine_state = 1;
             }
             break;
         case 1: // Start word received
             package->uid = data;
             rc_lib_global_package_uid = package->uid;
 
-            receiveStateMachineState = 2;
+            package->_receive_state_machine_state = 2;
             break;
         case 2: // Transmitter Id
             package->tid = data;
-            receiveStateMachineState = 3;
+            package->_receive_state_machine_state = 3;
             break;
         case 3: // Configuration
             package->resolution = _rc_lib_key_2_resolution_steps(data&0b111);
@@ -69,19 +66,19 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
             for(uint16_t c=0; c<package->channel_count; c++){
                 package->channel_data[c] = 0;
             }
-            dataByteCount = 0;
+            package->_data_byte_count = 0;
 
             // Following
             if(data & (0b1 << 7)){
-                receiveStateMachineState = 4;
+                package->_receive_state_machine_state = 4;
             } else {
-                receiveStateMachineState = 5;
+                package->_receive_state_machine_state = 5;
             }
             break;
         case 4: // Mesh
             package->routing_length = data & 0b1111;
             package->mesh = package->routing_length > 0;
-            receiveStateMachineState = 5;
+            package->_receive_state_machine_state = 5;
             break;
         case 5: // Data
         {
@@ -95,17 +92,17 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
             }
 
             for (int c = 0; c < 8; c++) {
-                uint8_t bit = (dataByteCount * 8 + c) % resBits;
-                package->channel_data[(dataByteCount * 8 + c) / resBits] |= ((data & (0b1 << c))?1:0) << bit;
+                uint8_t bit = (package->_data_byte_count * 8 + c) % resBits;
+                package->channel_data[(package->_data_byte_count * 8 + c) / resBits] |= ((data & (0b1 << c))?1:0) << bit;
             }
-            if (++dataByteCount >= dataSize) {
-                receiveStateMachineState = 6;
+            if (++package->_data_byte_count >= dataSize) {
+                package->_receive_state_machine_state = 6;
             }
         }
             break;
         case 6: // Checksum
             package->checksum = data;
-            receiveStateMachineState = 7;
+            package->_receive_state_machine_state = 7;
 
             if(rc_lib_calculate_checksum(package) == package->checksum){
                 rc_lib_error_count += 4;
@@ -113,16 +110,16 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
             break;
         case 7: // End byte
             if(data == RC_LIB_END) {
-                receiveStateMachineState = 0;
+                package->_receive_state_machine_state = 0;
                 package->buf_count++;
                 return (uint8_t)true;
             } else {
                 rc_lib_error_count += 4;
-                receiveStateMachineState = 0;
+                package->_receive_state_machine_state = 0;
                 return (uint8_t)false;
             }
         default:
-            receiveStateMachineState = 0;
+            package->_receive_state_machine_state = 0;
             break;
     }
     package->buffer[package->buf_count++] = data;
