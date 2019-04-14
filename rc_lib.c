@@ -26,9 +26,9 @@ uint8_t rc_lib_encode(rc_lib_package_t* package) {
         dataSize = (uint8_t)(dataSize/8 + 1);
     }
 
-    for(int c=0; c<dataSize; c++){
+    for(uint16_t c=0; c<dataSize; c++){
         package->buffer[4+c+package->mesh] = 0;
-        for(int b=0; b<8 && (c*8+b)<(resBits*package->channel_count); b++){
+        for(uint8_t b=0; b<8 && (c*8+b)<(resBits*package->channel_count); b++){
             uint8_t bit = (uint8_t)(package->channel_data[(c * 8 + b) / resBits] & (0b1 << ((c * 8 + b) % resBits)) ? 1:0);
             package->buffer[4+c+package->mesh] |= bit << b;
         }
@@ -66,7 +66,7 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
             package->resolution = _rc_lib_key_2_resolution_steps(data&0b111);
             package->channel_count = _rc_lib_key_2_channel_count((data&0b111000) >> 3);
 
-            for(int c=0; c<package->channel_count; c++){
+            for(uint16_t c=0; c<package->channel_count; c++){
                 package->channel_data[c] = 0;
             }
             dataByteCount = 0;
@@ -133,7 +133,7 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
 uint8_t rc_lib_calculate_checksum(rc_lib_package_t* package) {
     uint8_t checksum = 0;
 
-    for(uint16_t c=0; c<package->buf_count-3; c++){
+    for(int16_t c=0; c<package->buf_count-3; c++){
         checksum ^= package->buffer[c+1];
     }
 
