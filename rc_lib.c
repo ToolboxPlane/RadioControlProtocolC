@@ -36,7 +36,7 @@ uint8_t rc_lib_encode(rc_lib_package_t* package) {
         *curr_byte = 0;
         for(uint8_t b=0; b<(uint8_t)8; ++b){
             const uint8_t bit = (channel_data[div] >> mod) & 1;
-            if (++mod > resBits) {
+            if (++mod >= resBits) {
                 ++div;
                 mod = 0;
             }
