@@ -1,5 +1,5 @@
-#ifndef FLIGHTCONTROLLER_RCLIB_H
-#define FLIGHTCONTROLLER_RCLIB_H
+#ifndef RCLIB_H
+#define RCLIB_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -45,4 +45,4 @@ uint8_t _rc_lib_resolution_steps_2_bit_count(uint16_t steps);
 uint16_t _rc_lib_key_2_resolution_steps(uint8_t key);
 uint16_t _rc_lib_key_2_channel_count(uint8_t key);
 
-#endif //FLIGHTCONTROLLER_RCLIB_H
+#endif //RCLIB_H
