@@ -4,6 +4,14 @@ uint8_t rc_lib_global_package_uid = 0;
 uint8_t rc_lib_transmitter_id = 0;
 uint8_t rc_lib_error_count = 0;
 
+void rc_lib_init(rc_lib_package_t *package, uint16_t resolution, uint8_t channel_count) {
+    package->resolution = resolution;
+    package->channel_count = channel_count;
+    package->mesh = false;
+    package->discover_state = 0;
+    package->tid = rc_lib_transmitter_id;
+}
+
 uint8_t rc_lib_encode(rc_lib_package_t* package) {
     package->buffer[0] = RC_LIB_START;
     package->buffer[1] = ++rc_lib_global_package_uid;
