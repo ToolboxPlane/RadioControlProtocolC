@@ -4,6 +4,14 @@ uint8_t rc_lib_global_package_uid = 0;
 uint8_t rc_lib_transmitter_id = 0;
 uint8_t rc_lib_error_count = 0;
 
+void rc_lib_init(rc_lib_package_t *package, uint16_t resolution, uint8_t channel_count) {
+    package->resolution = resolution;
+    package->channel_count = channel_count;
+    package->mesh = false;
+    package->discover_state = 0;
+    package->tid = rc_lib_transmitter_id;
+}
+
 uint8_t rc_lib_encode(rc_lib_package_t* package) {
     package->buffer[0] = RC_LIB_START;
     package->buffer[1] = ++rc_lib_global_package_uid;
@@ -26,13 +34,10 @@ uint8_t rc_lib_encode(rc_lib_package_t* package) {
         dataSize = (uint16_t)(dataSize/8 + 1);
     }
 
-    const uint16_t total_bit_count = resBits * package->channel_count;
     uint16_t * const channel_data = package->channel_data;
-    uint8_t * const buffer = package->buffer;
-    register const uint8_t index_offset = 4 + package->mesh;
     uint8_t div = 0, mod = 0;
+    uint8_t * curr_byte = package->buffer+4+package->mesh;
     for(uint16_t c=0; c<dataSize; ++c){
-        uint8_t * const curr_byte = &buffer[index_offset+c];
         *curr_byte = 0;
         for(uint8_t b=0; b<(uint8_t)8; ++b){
             const uint8_t bit = (channel_data[div] >> mod) & 1;
@@ -42,6 +47,7 @@ uint8_t rc_lib_encode(rc_lib_package_t* package) {
             }
             *curr_byte |= bit << b;
         }
+        ++curr_byte;
     }
 
     package->buf_count = (uint8_t)(4+dataSize+2+package->mesh);

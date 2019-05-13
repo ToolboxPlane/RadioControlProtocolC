@@ -1,5 +1,5 @@
-#ifndef FLIGHTCONTROLLER_RCLIB_H
-#define FLIGHTCONTROLLER_RCLIB_H
+#ifndef RCLIB_H
+#define RCLIB_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -12,7 +12,7 @@ extern uint8_t rc_lib_global_package_uid;
 extern uint8_t rc_lib_transmitter_id;
 extern uint8_t rc_lib_error_count;
 
-typedef struct rc_lib_package {
+typedef struct {
     uint16_t channel_data[DATA_BUFFER_SIZE];
     uint8_t buffer[DATA_BUFFER_SIZE];
     uint8_t buf_count;
@@ -31,6 +31,7 @@ typedef struct rc_lib_package {
     uint8_t _data_byte_count;
 } rc_lib_package_t;
 
+void rc_lib_init(rc_lib_package_t* package, uint16_t resolution, uint8_t channel_count);
 uint8_t rc_lib_encode(rc_lib_package_t* package);
 uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data);
 uint8_t rc_lib_calculate_checksum(rc_lib_package_t* checksum);
@@ -45,4 +46,4 @@ uint8_t _rc_lib_resolution_steps_2_bit_count(uint16_t steps);
 uint16_t _rc_lib_key_2_resolution_steps(uint8_t key);
 uint16_t _rc_lib_key_2_channel_count(uint8_t key);
 
-#endif //FLIGHTCONTROLLER_RCLIB_H
+#endif //RCLIB_H
