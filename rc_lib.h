@@ -21,6 +21,7 @@ typedef struct {
     uint8_t tid; ///< Unique transmitter (device) id
     uint16_t channel_count; ///< Number of saved channels
     uint16_t resolution; ///< Resolution of each channel in pixels
+    uint8_t error;
 
     uint8_t checksum;
 
@@ -31,7 +32,8 @@ typedef struct {
     uint8_t _data_byte_count;
 } rc_lib_package_t;
 
-void rc_lib_init(rc_lib_package_t* package, uint16_t resolution, uint8_t channel_count);
+void rc_lib_init_rx(rc_lib_package_t* package);
+void rc_lib_init_tx(rc_lib_package_t* package, uint16_t resolution, uint8_t channel_count);
 uint8_t rc_lib_encode(rc_lib_package_t* package);
 uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data);
 uint8_t rc_lib_calculate_checksum(rc_lib_package_t* checksum);

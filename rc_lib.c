@@ -4,12 +4,24 @@ uint8_t rc_lib_global_package_uid = 0;
 uint8_t rc_lib_transmitter_id = 0;
 uint8_t rc_lib_error_count = 0;
 
-void rc_lib_init(rc_lib_package_t *package, uint16_t resolution, uint8_t channel_count) {
+void rc_lib_init_rx(rc_lib_package_t *package) {
+    package->_receive_state_machine_state = 0;
+    package->buf_count = 0;
+    package->_data_byte_count = 0;
+    package->error = false;
+    package->mesh = false;
+    package->routing_length = 0;
+}
+
+void rc_lib_init_tx(rc_lib_package_t *package, uint16_t resolution, uint8_t channel_count) {
     package->resolution = resolution;
     package->channel_count = channel_count;
     package->mesh = false;
     package->discover_state = 0;
     package->tid = rc_lib_transmitter_id;
+    package->buf_count = 0;
+    package->_data_byte_count = 0;
+    package->error = false;
 }
 
 uint8_t rc_lib_encode(rc_lib_package_t* package) {
@@ -78,6 +90,7 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
         case 3: // Configuration
             package->resolution = _rc_lib_key_2_resolution_steps(data&0b111);
             package->channel_count = _rc_lib_key_2_channel_count((data&0b111000) >> 3);
+            package->error = (data >> 6) & 1;
 
             for(uint16_t c=0; c<package->channel_count; c++){
                 package->channel_data[c] = 0;
@@ -107,7 +120,7 @@ uint8_t rc_lib_decode(rc_lib_package_t* package, uint8_t data) {
                 dataSize = dataSize / 8 + 1;
             }
 
-            for (int c = 0; c < 8; c++) {
+            for (uint8_t c = 0; c < 8; c++) {
                 uint8_t bit = (package->_data_byte_count * 8 + c) % resBits;
                 package->channel_data[(package->_data_byte_count * 8 + c) / resBits] |= ((data & (0b1 << c))?1:0) << bit;
             }

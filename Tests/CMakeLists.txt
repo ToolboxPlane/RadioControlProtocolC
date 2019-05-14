@@ -12,7 +12,7 @@ if (GTest_FOUND)
     include_directories(${GTEST_INCLUDE_DIR})
 
     set(SOURCES ../rc_lib.c)
-    file(GLOB_RECURSE TEST_SOURCES . TestCases/*.cpp)
+    set(TEST_SOURCES Decode.cpp)
 
     include_directories(${CMAKE_SOURCE_DIR})
     add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${TEST_SOURCES})
