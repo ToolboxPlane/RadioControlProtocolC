@@ -5,23 +5,24 @@ uint8_t rc_lib_transmitter_id = 0;
 uint8_t rc_lib_error_count = 0;
 
 void rc_lib_init_rx(rc_lib_package_t *package) {
+    package->_data_byte_count = 0;
     package->_receive_state_machine_state = 0;
     package->buf_count = 0;
-    package->_data_byte_count = 0;
     package->error = false;
     package->mesh = false;
     package->routing_length = 0;
 }
 
 void rc_lib_init_tx(rc_lib_package_t *package, uint16_t resolution, uint8_t channel_count) {
-    package->resolution = resolution;
-    package->channel_count = channel_count;
-    package->mesh = false;
-    package->discover_state = 0;
-    package->tid = rc_lib_transmitter_id;
-    package->buf_count = 0;
     package->_data_byte_count = 0;
+    package->_receive_state_machine_state = 0;
+    package->buf_count = 0;
+    package->channel_count = channel_count;
+    package->discover_state = 0;
     package->error = false;
+    package->mesh = false;
+    package->resolution = resolution;
+    package->tid = rc_lib_transmitter_id;
 }
 
 uint8_t rc_lib_encode(rc_lib_package_t* package) {
