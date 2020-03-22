@@ -4,9 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifndef DATA_BUFFER_SIZE
 #define DATA_BUFFER_SIZE 64
-#endif
 
 extern uint8_t rc_lib_global_package_uid;
 extern uint8_t rc_lib_transmitter_id;
