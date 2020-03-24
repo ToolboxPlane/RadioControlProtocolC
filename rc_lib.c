@@ -38,7 +38,7 @@ void rc_lib_init_tx(rc_lib_package_t *package, uint16_t resolution, uint8_t chan
 uint8_t rc_lib_encode(rc_lib_package_t *package) {
     package->buffer[0] = RC_LIB_START;
     package->buffer[1] = ++rc_lib_global_package_uid;
-    package->buffer[2] = rc_lib_transmitter_id;
+    package->buffer[2] = package->tid;
     package->mesh = (uint8_t)(package->mesh?1:0);
     package->buffer[3] = (uint8_t)(_rc_lib_resolution_steps_2_key(package->resolution) |
                                      _rc_lib_channel_count_2_key(package->channel_count) << 3 |
