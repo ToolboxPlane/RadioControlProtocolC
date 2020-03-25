@@ -4,15 +4,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CHANNEL_BUFFER_SIZE 256
-#define DATA_BUFFER_SIZE ((CHANNEL_BUFFER_SIZE+ CHANNEL_BUFFER_SIZE/2) + 7)
+#ifndef MAX_CHANNEL_COUNT
+    #define MAX_CHANNEL_COUNT 256
+#endif
+#ifndef MAX_RESOLUTION
+    #define MAX_RESOLUTION 12
+#endif
+
+#define DATA_BUFFER_SIZE (MAX_RESOLUTION * MAX_CHANNEL_COUNT/8 + 8)
 
 extern uint8_t rc_lib_global_package_uid;
 extern uint8_t rc_lib_transmitter_id;
 extern uint8_t rc_lib_error_count;
 
 typedef struct {
-    uint16_t channel_data[CHANNEL_BUFFER_SIZE];
+    uint16_t channel_data[MAX_CHANNEL_COUNT];
     uint8_t buffer[DATA_BUFFER_SIZE];
     uint8_t buf_count;
 
