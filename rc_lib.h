@@ -4,14 +4,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define DATA_BUFFER_SIZE 64
+#define CHANNEL_BUFFER_SIZE 256
+#define DATA_BUFFER_SIZE ((CHANNEL_BUFFER_SIZE+ CHANNEL_BUFFER_SIZE/2) + 7)
 
 extern uint8_t rc_lib_global_package_uid;
 extern uint8_t rc_lib_transmitter_id;
 extern uint8_t rc_lib_error_count;
 
 typedef struct {
-    uint16_t channel_data[DATA_BUFFER_SIZE];
+    uint16_t channel_data[CHANNEL_BUFFER_SIZE];
     uint8_t buffer[DATA_BUFFER_SIZE];
     uint8_t buf_count;
 
