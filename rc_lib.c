@@ -145,7 +145,7 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
             package->_receive_state_machine_state = 7;
 
             if(rc_lib_calculate_checksum(package) == package->checksum){
-                rc_lib_error_count += 4;
+                ++rc_lib_error_count;
             }
             break;
         case 7: // End byte
@@ -154,7 +154,7 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
                 package->buffer[package->buf_count++] = data;
                 return (uint8_t)true;
             } else {
-                rc_lib_error_count += 4;
+                ++rc_lib_error_count;
                 package->_receive_state_machine_state = 0;
                 return (uint8_t)false;
             }

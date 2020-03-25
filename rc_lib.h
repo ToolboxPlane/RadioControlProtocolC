@@ -13,8 +13,19 @@
 
 #define DATA_BUFFER_SIZE (MAX_RESOLUTION * MAX_CHANNEL_COUNT/8 + 8)
 
+/**
+ * Unique ID of the next package that is serialized, for normal usage this variable can be ignored
+ */
 extern uint8_t rc_lib_global_package_uid;
+
+/**
+ * The ID of the transmitter (the current device), needs to be set before initialising a package
+ */
 extern uint8_t rc_lib_transmitter_id;
+
+/**
+ * The number of decoding errors since the start, restart the count by setting this variable to zero
+ */
 extern uint8_t rc_lib_error_count;
 
 typedef struct {
