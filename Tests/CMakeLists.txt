@@ -6,12 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -Werror -fsanitize=address -fno-omit-frame-pointer")
 
+set(SOURCES ../rc_lib.c)
+
 enable_testing()
 find_package(GTest)
 if (GTest_FOUND)
     include_directories(${GTEST_INCLUDE_DIR})
 
-    set(SOURCES ../rc_lib.c)
     set(TEST_SOURCES Decode.cpp)
 
     include_directories(${CMAKE_SOURCE_DIR})
@@ -25,3 +26,6 @@ if (GTest_FOUND)
 else()
     message(WARNING "GTest not found, you won't be able to run the tests")
 endif()
+
+project(Fuzzy)
+add_executable(${PROJECT_NAME} fuzzy.c ${SOURCES})

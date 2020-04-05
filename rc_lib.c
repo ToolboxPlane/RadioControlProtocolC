@@ -37,8 +37,8 @@ void rc_lib_init_tx(rc_lib_package_t *package, uint16_t resolution, uint8_t chan
 
 uint8_t rc_lib_encode(rc_lib_package_t *package) {
     package->buffer[0] = RC_LIB_START;
-    package->buffer[1] = ++rc_lib_global_package_uid;
-    package->buffer[2] = rc_lib_transmitter_id;
+    package->uid = package->buffer[1] = ++rc_lib_global_package_uid;
+    package->buffer[2] = package->tid;
     package->mesh = (uint8_t)(package->mesh?1:0);
     package->buffer[3] = (uint8_t)(_rc_lib_resolution_steps_2_key(package->resolution) |
                                      _rc_lib_channel_count_2_key(package->channel_count) << 3u |
@@ -145,16 +145,16 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
             package->_receive_state_machine_state = 7;
 
             if(rc_lib_calculate_checksum(package) == package->checksum){
-                rc_lib_error_count += 4;
+                ++rc_lib_error_count;
             }
             break;
         case 7: // End byte
             if(data == RC_LIB_END) {
                 package->_receive_state_machine_state = 0;
-                package->buf_count++;
+                package->buffer[package->buf_count++] = data;
                 return (uint8_t)true;
             } else {
-                rc_lib_error_count += 4;
+                ++rc_lib_error_count;
                 package->_receive_state_machine_state = 0;
                 return (uint8_t)false;
             }
@@ -168,10 +168,10 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
 }
 
 uint8_t rc_lib_calculate_checksum(const rc_lib_package_t *package) {
-    uint8_t checksum = 0;
+    uint8_t checksum = package->buffer[1];
 
-    for(int16_t c=0; c<package->buf_count-3; c++){
-        checksum ^= package->buffer[c+1];
+    for(int16_t c=2; c<package->buf_count-2; ++c){
+        checksum ^= package->buffer[c];
     }
 
     return checksum;
