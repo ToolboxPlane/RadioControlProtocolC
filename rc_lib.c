@@ -41,9 +41,9 @@ uint8_t rc_lib_encode(rc_lib_package_t *package) {
     package->buffer[2] = rc_lib_transmitter_id;
     package->mesh = (uint8_t)(package->mesh?1:0);
     package->buffer[3] = (uint8_t)(_rc_lib_resolution_steps_2_key(package->resolution) |
-                                     _rc_lib_channel_count_2_key(package->channel_count) << 3 |
-                                     (rc_lib_error_count>0?1:0) << 6 |
-                                     package->mesh << 7);
+                                     _rc_lib_channel_count_2_key(package->channel_count) << 3u |
+                                     (rc_lib_error_count>0?1u:0u) << 6u |
+                                     package->mesh << 7u);
     if(package->mesh){
         package->buffer[4] = package->routing_length;
     }
@@ -63,7 +63,7 @@ uint8_t rc_lib_encode(rc_lib_package_t *package) {
     for(uint16_t c=0; c<dataSize; ++c){
         *curr_byte = 0;
         for(uint8_t b=0; b<(uint8_t)8; ++b){
-            const uint8_t bit = (channel_data[div] >> mod) & 1;
+            const uint8_t bit = (channel_data[div] >> mod) & 1u;
             if (++mod >= resBits) {
                 ++div;
                 mod = 0;
@@ -99,9 +99,9 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
             package->_receive_state_machine_state = 3;
             break;
         case 3: // Configuration
-            package->resolution = _rc_lib_key_2_resolution_steps(data&0b111);
-            package->channel_count = _rc_lib_key_2_channel_count((data&0b111000) >> 3);
-            package->error = (data >> 6) & 1;
+            package->resolution = _rc_lib_key_2_resolution_steps(data&0b111u);
+            package->channel_count = _rc_lib_key_2_channel_count((data&0b111000u) >> 3u);
+            package->error = (data >> 6u) & 1u;
 
             for(uint16_t c=0; c<package->channel_count; c++){
                 package->channel_data[c] = 0;
@@ -109,14 +109,14 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
             package->_data_byte_count = 0;
 
             // Following
-            if(data & (0b1 << 7)){
+            if(data & (0b1u << 7u)){
                 package->_receive_state_machine_state = 4;
             } else {
                 package->_receive_state_machine_state = 5;
             }
             break;
         case 4: // Mesh
-            package->routing_length = data & 0b1111;
+            package->routing_length = data & 0b1111u;
             package->mesh = package->routing_length > 0;
             package->_receive_state_machine_state = 5;
             break;
@@ -133,7 +133,7 @@ uint8_t rc_lib_decode(rc_lib_package_t *package, uint8_t data) {
 
             for (uint8_t c = 0; c < 8; c++) {
                 uint8_t bit = (package->_data_byte_count * 8 + c) % resBits;
-                package->channel_data[(package->_data_byte_count * 8 + c) / resBits] |= ((data & (0b1 << c))?1:0) << bit;
+                package->channel_data[(package->_data_byte_count * 8 + c) / resBits] |= ((data & (0b1u << c))?1u:0u) << bit;
             }
             if (++package->_data_byte_count >= dataSize) {
                 package->_receive_state_machine_state = 6;
@@ -236,7 +236,6 @@ uint8_t _rc_lib_resolution_steps_2_key(uint16_t steps) {
         case 2048:
             return 0b110;
         case 4096:
-            return 0b111;
         default:
             return 0b111;
     }
@@ -259,7 +258,6 @@ uint8_t _rc_lib_channel_count_2_key(uint16_t channel_count) {
         case 64:
             return 0b110;
         case 256:
-            return 0b111;
         default:
             return 0b111;
     }
@@ -282,7 +280,6 @@ uint8_t _rc_lib_resolution_steps_2_bit_count(uint16_t steps) {
         case 2048:
             return 11;
         case 4096:
-            return 12;
         default:
             return 12;
     }
@@ -305,7 +302,6 @@ uint16_t _rc_lib_key_2_resolution_steps(uint8_t key) {
         case 0b110:
             return 2048;
         case 0b111:
-            return 4096;
         default:
             return 4096;
     }
@@ -328,7 +324,6 @@ uint16_t _rc_lib_key_2_channel_count(uint8_t key) {
         case 0b110:
             return 64;
         case 0b111:
-            return 256;
         default:
             return 256;
     }
